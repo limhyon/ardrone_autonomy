@@ -12,6 +12,7 @@ ARDroneDriver::ARDroneDriver()
 	: image_transport(node_handle)
 {
     inited = false;
+	set_camera_info_srv_ = node_handle.advertiseService("ardrone/set_camera_info",set_camera_info_Callback);
 	cmd_vel_sub = node_handle.subscribe("cmd_vel", 100, &cmdVelCallback);
 	takeoff_sub = node_handle.subscribe("ardrone/takeoff", 1, &takeoffCallback);
 	reset_sub = node_handle.subscribe("ardrone/reset", 1, &resetCallback);
@@ -29,10 +30,18 @@ ARDroneDriver::ARDroneDriver()
 //	setHullType_service = node_handle.advertiseService("/ardrone/sethulltype", setHullTypeCallback);
 
     droneFrameId = (ros::param::get("~drone_frame_id", droneFrameId)) ? droneFrameId : "ardrone_base";
+    intrinsic_ini = (ros::param::get("~calibration_file", intrinsic_ini)) ? intrinsic_ini : "";
     droneFrameBase = droneFrameId + "_link";
     droneFrameIMU = droneFrameId + "_imu";
     droneFrameFrontCam = droneFrameId + "_frontcam";
     droneFrameBottomCam = droneFrameId + "_bottomcam";
+
+	std::cout << "Calibration file " << intrinsic_ini << std::endl;
+
+	cinfo_ = boost::shared_ptr<camera_info_manager::CameraInfoManager>(new camera_info_manager::CameraInfoManager(node_handle,droneFrameFrontCam,intrinsic_ini));
+
+	if(cinfo_->isCalibrated())
+		ROS_INFO("Ardrone camera has loaded caliberation file '%s'",intrinsic_ini.c_str());
 
     // Fill constant parts of IMU Message
 
@@ -301,12 +310,17 @@ void ARDroneDriver::publish_video()
         sensor_msgs::CameraInfo cinfo_msg;
         sensor_msgs::Image::_data_type::iterator _it;
 
+	cam_info_ptr_ = sensor_msgs::CameraInfoPtr(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));	
+
         image_msg.header.stamp = ros::Time::now();
         cinfo_msg.header.stamp = ros::Time::now();
+	cam_info_ptr_->header.stamp = ros::Time::now();
+
         if (cam_state == ZAP_CHANNEL_HORI)
         {
             image_msg.header.frame_id = droneFrameFrontCam;
             cinfo_msg.header.frame_id = droneFrameFrontCam;
+            cam_info_ptr_->header.frame_id = droneFrameFrontCam;
         }
         else if (cam_state == ZAP_CHANNEL_VERT)
         {
@@ -327,9 +341,10 @@ void ARDroneDriver::publish_video()
         std::copy(buffer, buffer+(D2_STREAM_WIDTH*D2_STREAM_HEIGHT*3), image_msg.data.begin());
 
         // We only put the width and height in here.
-        cinfo_msg.width = D2_STREAM_WIDTH;
-        cinfo_msg.height = D2_STREAM_HEIGHT;
-        image_pub.publish(image_msg, cinfo_msg); // /ardrone
+        //cinfo_msg.width = D2_STREAM_WIDTH;
+        //cinfo_msg.height = D2_STREAM_HEIGHT;
+        //image_pub.publish(image_msg, cinfo_msg); // /ardrone
+        image_pub.publish(image_msg, *cam_info_ptr_); // /ardrone
         if (cam_state == ZAP_CHANNEL_HORI)
         {
             /*

@@ -33,3 +33,9 @@ const vp_api_stage_funcs_t vp_stages_export_funcs =
 	(vp_api_stage_transform_t)export_stage_transform,
 	(vp_api_stage_close_t)export_stage_close
 };
+
+bool set_camera_info_Callback(sensor_msgs::SetCameraInfo::Request& request, sensor_msgs::SetCameraInfo::Response& response)
+{
+        //ROS_INFO("Width,height : %f,%f",cam_info.width,cam_info.height);
+        return true;
+}

@@ -2,6 +2,7 @@
 #define _VIDEO_H_
 
 #include "ardrone_sdk.h"
+#include <sensor_msgs/SetCameraInfo.h>
 
 // The maximum memory allocation
 #define MAX_STREAM_WIDTH 640
@@ -36,6 +37,8 @@ extern video_com_multisocket_config_t icc;
 extern const vp_api_stage_funcs_t vp_stages_export_funcs;
 extern unsigned char buffer[]; // size STREAM_WIDTH * STREAM_HEIGHT * 3
 extern long int current_frame_id; // this will be incremented for every frame
+
+bool set_camera_info_Callback(sensor_msgs::SetCameraInfo::Request& request, sensor_msgs::SetCameraInfo::Response& response);
 
 #endif
 

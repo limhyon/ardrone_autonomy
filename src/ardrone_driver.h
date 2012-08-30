@@ -6,6 +6,8 @@
 #include <tf/transform_broadcaster.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/SetCameraInfo.h>
+#include <camera_info_manager/camera_info_manager.h>
 #include <ardrone_autonomy/Navdata.h>
 #include "ardrone_sdk.h"
 
@@ -26,6 +28,8 @@ private:
     void publish_tf();
 
     ros::NodeHandle node_handle;
+	ros::ServiceServer set_camera_info_srv_;
+	boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;
 	ros::Subscriber cmd_vel_sub;
 	ros::Subscriber takeoff_sub;
 	ros::Subscriber reset_sub;
@@ -37,6 +41,8 @@ private:
 
     ros::Publisher navdata_pub;
     ros::Publisher imu_pub;
+
+	sensor_msgs::CameraInfoPtr cam_info_ptr_;
 
     tf::TransformBroadcaster tf_broad;
 
@@ -64,6 +70,7 @@ private:
 
     bool inited;
     std::string droneFrameId;
+    std::string intrinsic_ini;
 
 
     /*
