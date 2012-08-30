@@ -64,3 +64,8 @@ float32[] tags_distance
 
 #time stamp
 float32 tm
+
+#raw vision
+float32 vx_raw
+float32 vy_raw
+float32 vz_raw

@@ -47,7 +47,7 @@ extern navdata_time_t arnavtime;
 extern navdata_pressure_raw_t navdata_pressure;
 extern navdata_magneto_t navdata_magneto;
 extern navdata_wind_speed_t navdata_wind;
-
+extern navdata_vision_raw_t navdata_vision_raw;
 extern int32_t should_exit;
 extern long int current_navdata_seq_id;
 #endif

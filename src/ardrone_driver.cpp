@@ -410,6 +410,10 @@ void ARDroneDriver::publish_navdata()
         msg.wind_speed = navdata_wind.wind_speed;
         msg.wind_angle = navdata_wind.wind_angle;
         msg.wind_comp_angle = navdata_wind.wind_compensation_phi;
+	
+	msg.vx_raw = navdata_vision_raw.vision_tx_raw;
+	msg.vy_raw = navdata_vision_raw.vision_ty_raw;
+	msg.vz_raw = navdata_vision_raw.vision_tz_raw;
     }
     else
     {

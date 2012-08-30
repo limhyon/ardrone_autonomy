@@ -6,7 +6,7 @@
 navdata_demo_t navdata;
 navdata_phys_measures_t navdata_phys;
 navdata_vision_detect_t navdata_detect;
-
+navdata_vision_raw_t navdata_vision_raw;
 navdata_pressure_raw_t navdata_pressure;
 navdata_magneto_t navdata_magneto;
 navdata_wind_speed_t navdata_wind;
@@ -87,7 +87,7 @@ extern "C" {
 //        ardrone_application_default_config.detections_select_v = rosDriver->getRosParam("~detections_select_v", 
 //                (double) TAG_TYPE_MASK(TAG_TYPE_BLACK_ROUNDEL));
        
-        ardrone_application_default_config.navdata_options = NAVDATA_OPTION_FULL_MASK /*&
+        ardrone_application_default_config.navdata_options = NAVDATA_OPTION_FULL_MASK; /*&
         ~(NAVDATA_OPTION_MASK(NAVDATA_TRACKERS_SEND_TAG)
         | NAVDATA_OPTION_MASK(NAVDATA_VISION_OF_TAG)
         | NAVDATA_OPTION_MASK(NAVDATA_VISION_PERF_TAG)
@@ -191,6 +191,7 @@ extern "C" {
             navdata_pressure = pnd->navdata_pressure_raw;
             navdata_magneto = pnd->navdata_magneto;
             navdata_wind = pnd->navdata_wind_speed;
+		navdata_vision_raw = pnd->navdata_vision_raw;
         }
 		current_navdata_seq_id++;
 		return C_OK;
