@@ -2,7 +2,6 @@
 	<arg name="ardrone_node" default="ardrone"/>
 	<arg name="calibration_bottom" default="file://$(find ardrone_autonomy)/bottom_camera_intrinsics.ini" />
 	<arg name="calibration_front" default="file://$(find ardrone_autonomy)/front_camera_intrinsics.ini" />
-
 	<node name="$(arg ardrone_node)" pkg="ardrone_autonomy" type="ardrone_driver" respawn="false" output="screen">
 		<param name="calibration_bottom" type="str" value="$(arg calibration_bottom)"/>
 		<param name="calibration_front" type="str" value="$(arg calibration_front)"/>
@@ -13,4 +12,8 @@
                 <remap from="image" to="/$(arg ardrone_node)/image_raw" />
                 <param name="autosize" type="bool" value="true"/>
         </node>
+	<node ns="camera" pkg="image_proc" type="image_proc" name="image_proc">
+		<remap from="image_raw" to="/$(arg ardrone_node)/image_raw" />
+	</node>
+	<!--<node name="drone_teleop" pkg="drone_teleop" type="drone_teleop.py" />-->
 </launch>

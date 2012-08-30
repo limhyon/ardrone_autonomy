@@ -110,6 +110,12 @@ void takeoffCallback(const std_msgs::Empty &msg)
     needs_takeoff = true;
 }
 
+bool setFlatTrim(ardrone_autonomy::FlatTrim::Request& request, ardrone_autonomy::FlatTrim::Response& response)
+{
+	ardrone_at_set_flat_trim();
+	return true;
+}
+
 C_RESULT open_teleop(void)
 {
 	return C_OK;

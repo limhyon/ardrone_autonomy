@@ -52,6 +52,7 @@ private:
 	ros::ServiceServer toggleNavdataDemo_service;
 	ros::ServiceServer setCamChannel_service;
 	ros::ServiceServer setLedAnimation_service;
+	ros::ServiceServer setFlatTrim_service;
 	
 	/*
 	 * Orange Green : 1
