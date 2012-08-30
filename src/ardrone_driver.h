@@ -29,7 +29,8 @@ private:
 
     ros::NodeHandle node_handle;
 	ros::ServiceServer set_camera_info_srv_;
-	boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;
+	boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_front_;
+	boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_bottom_;
 	ros::Subscriber cmd_vel_sub;
 	ros::Subscriber takeoff_sub;
 	ros::Subscriber reset_sub;
@@ -70,7 +71,8 @@ private:
 
     bool inited;
     std::string droneFrameId;
-    std::string intrinsic_ini;
+    std::string front_intrinsic_ini;
+    std::string bottom_intrinsic_ini;
 
 
     /*

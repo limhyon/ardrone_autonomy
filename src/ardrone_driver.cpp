@@ -30,18 +30,22 @@ ARDroneDriver::ARDroneDriver()
 //	setHullType_service = node_handle.advertiseService("/ardrone/sethulltype", setHullTypeCallback);
 
     droneFrameId = (ros::param::get("~drone_frame_id", droneFrameId)) ? droneFrameId : "ardrone_base";
-    intrinsic_ini = (ros::param::get("~calibration_file", intrinsic_ini)) ? intrinsic_ini : "";
+    front_intrinsic_ini = (ros::param::get("~calibration_front", front_intrinsic_ini)) ? front_intrinsic_ini : "";
+    bottom_intrinsic_ini = (ros::param::get("~calibration_bottom", bottom_intrinsic_ini)) ? bottom_intrinsic_ini : "";
     droneFrameBase = droneFrameId + "_link";
     droneFrameIMU = droneFrameId + "_imu";
     droneFrameFrontCam = droneFrameId + "_frontcam";
     droneFrameBottomCam = droneFrameId + "_bottomcam";
 
-	std::cout << "Calibration file " << intrinsic_ini << std::endl;
+	cinfo_front_ = boost::shared_ptr<camera_info_manager::CameraInfoManager>(new camera_info_manager::CameraInfoManager(node_handle,droneFrameFrontCam,front_intrinsic_ini));
+	cinfo_bottom_ = boost::shared_ptr<camera_info_manager::CameraInfoManager>(new camera_info_manager::CameraInfoManager(node_handle,droneFrameBottomCam,bottom_intrinsic_ini));
 
-	cinfo_ = boost::shared_ptr<camera_info_manager::CameraInfoManager>(new camera_info_manager::CameraInfoManager(node_handle,droneFrameFrontCam,intrinsic_ini));
+	ROS_INFO("%s\n %s",front_intrinsic_ini.c_str(),bottom_intrinsic_ini.c_str());
 
-	if(cinfo_->isCalibrated())
-		ROS_INFO("Ardrone camera has loaded caliberation file '%s'",intrinsic_ini.c_str());
+	if(cinfo_front_->isCalibrated())
+		ROS_INFO("ARDrone frontal camera has loaded caliberation file '%s'",front_intrinsic_ini.c_str());
+	if(cinfo_bottom_->isCalibrated())
+		ROS_INFO("ARDrone bottom camera has loaded caliberation file '%s'",bottom_intrinsic_ini.c_str());
 
     // Fill constant parts of IMU Message
 
@@ -307,30 +311,27 @@ void ARDroneDriver::publish_video()
     if (IS_ARDRONE2)
     {
         sensor_msgs::Image image_msg;
-        sensor_msgs::CameraInfo cinfo_msg;
         sensor_msgs::Image::_data_type::iterator _it;
-
-	cam_info_ptr_ = sensor_msgs::CameraInfoPtr(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));	
-
-        image_msg.header.stamp = ros::Time::now();
-        cinfo_msg.header.stamp = ros::Time::now();
-	cam_info_ptr_->header.stamp = ros::Time::now();
 
         if (cam_state == ZAP_CHANNEL_HORI)
         {
             image_msg.header.frame_id = droneFrameFrontCam;
-            cinfo_msg.header.frame_id = droneFrameFrontCam;
+	    cam_info_ptr_ = sensor_msgs::CameraInfoPtr(new sensor_msgs::CameraInfo(cinfo_front_->getCameraInfo()));	
             cam_info_ptr_->header.frame_id = droneFrameFrontCam;
         }
         else if (cam_state == ZAP_CHANNEL_VERT)
         {
             image_msg.header.frame_id = droneFrameBottomCam;
-            cinfo_msg.header.frame_id = droneFrameBottomCam;
+	    cam_info_ptr_ = sensor_msgs::CameraInfoPtr(new sensor_msgs::CameraInfo(cinfo_bottom_->getCameraInfo()));	
+            cam_info_ptr_->header.frame_id = droneFrameFrontCam;
         }
         else
         {
             ROS_WARN_ONCE("Something is wrong with camera channel config.");
         }
+
+        image_msg.header.stamp = ros::Time::now();
+	cam_info_ptr_->header.stamp = ros::Time::now();
 
         image_msg.width = D2_STREAM_WIDTH;
         image_msg.height = D2_STREAM_HEIGHT;
@@ -345,19 +346,20 @@ void ARDroneDriver::publish_video()
         //cinfo_msg.height = D2_STREAM_HEIGHT;
         //image_pub.publish(image_msg, cinfo_msg); // /ardrone
         image_pub.publish(image_msg, *cam_info_ptr_); // /ardrone
-        if (cam_state == ZAP_CHANNEL_HORI)
+        
+	if (cam_state == ZAP_CHANNEL_HORI)
         {
             /*
             * Horizontal camera is activated, only /ardrone/front/ is being updated 
             */
-            hori_pub.publish(image_msg, cinfo_msg);
+            hori_pub.publish(image_msg,*cam_info_ptr_ );
         }
         else if (cam_state == ZAP_CHANNEL_VERT)
         {
             /*
             * Vertical camera is activated, only /ardrone/bottom/ is being updated 
             */
-            vert_pub.publish(image_msg, cinfo_msg);
+            vert_pub.publish(image_msg, *cam_info_ptr_);
         }
     }
 	
