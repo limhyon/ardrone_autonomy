@@ -68,6 +68,7 @@ private:
 	//ros::ServiceServer setHullType_service;
 
 	int last_frame_id;
+	int last_navdata_seq_id;
 	int flying_state;
 
     bool inited;

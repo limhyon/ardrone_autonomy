@@ -10,7 +10,7 @@
 
 ARDroneDriver::ARDroneDriver()
 	: image_transport(node_handle)
-{
+{ 
     inited = false;
 	set_camera_info_srv_ = node_handle.advertiseService("ardrone/set_camera_info",set_camera_info_Callback);
 	cmd_vel_sub = node_handle.subscribe("cmd_vel", 100, &cmdVelCallback);
@@ -75,7 +75,7 @@ ARDroneDriver::~ARDroneDriver()
 
 void ARDroneDriver::run()
 {
-	ros::Rate loop_rate(30);
+	ros::Rate loop_rate(200);
     ros::Time startTime = ros::Time::now();
 
 	while (node_handle.ok())
@@ -95,12 +95,17 @@ void ARDroneDriver::run()
             if (current_frame_id != last_frame_id)
             {
                 publish_video();
-                publish_navdata();
-                publish_tf();
                 last_frame_id = current_frame_id;
             }
+
+	    if(current_navdata_seq_id != last_navdata_seq_id)
+		{
+                	publish_navdata();
+                	publish_tf();
+			last_navdata_seq_id = current_navdata_seq_id;
+		}
         }
-        ros::spinOnce();
+        	ros::spinOnce();
 		loop_rate.sleep();
 	}
     printf("ROS loop terminated ... \n");

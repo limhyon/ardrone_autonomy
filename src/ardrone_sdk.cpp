@@ -16,6 +16,7 @@ navdata_time_t arnavtime;
 ARDroneDriver* rosDriver;
 
 int32_t should_exit;
+long int current_navdata_seq_id = 0;
 
 extern "C" {
     vp_stages_latency_estimation_config_t vlat;
@@ -77,7 +78,7 @@ extern "C" {
         ardrone_application_default_config.control_yaw = (float) rosDriver->getRosParam("~control_yaw", (100.0 /180.0) * 3.1415);
         ardrone_application_default_config.euler_angle_max = (float) rosDriver->getRosParam("~euler_angle_max", (12.0 / 180.0) * 3.1415);
         ardrone_application_default_config.bitrate = (int) rosDriver->getRosParam("~bitrate", 4000.0);                
-        ardrone_application_default_config.navdata_demo = (int) rosDriver->getRosParam("~navdata_demo", (double) 1);
+        ardrone_application_default_config.navdata_demo = (int) rosDriver->getRosParam("~navdata_demo", (double) 0);
         ardrone_application_default_config.detect_type = (int) rosDriver->getRosParam("~detect_type", (double) CAD_TYPE_MULTIPLE_DETECTION_MODE);
         ardrone_application_default_config.detections_select_h = rosDriver->getRosParam("~detections_select_h", 
                 (double) TAG_TYPE_MASK(TAG_TYPE_SHELL_TAG_V2));
@@ -109,7 +110,7 @@ extern "C" {
         in_picture->width          = _w;
         in_picture->height         = _h;
 
-        out_picture->framerate     = 20;
+        out_picture->framerate     = 30;
         out_picture->format        = PIX_FMT_RGB24;
         out_picture->width         = _w;
         out_picture->height        = _h;
@@ -160,7 +161,7 @@ extern "C" {
         }
         // Threads do not start automatically
         video_stage_resume_thread();
-        ardrone_tool_set_refresh_time(25);
+        ardrone_tool_set_refresh_time(4);
         //rosDriver->configure_drone();
 		START_THREAD(update_ros, rosDriver);
 		return C_OK;
@@ -191,6 +192,7 @@ extern "C" {
             navdata_magneto = pnd->navdata_magneto;
             navdata_wind = pnd->navdata_wind_speed;
         }
+		current_navdata_seq_id++;
 		return C_OK;
 	}
 
