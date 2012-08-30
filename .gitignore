@@ -13,3 +13,9 @@
 /nbproject/private/
 Makefile
 /build/CMakeFiles/
+
+bin/*
+build/*
+msg_gen/*
+src/ardrone_autonomy/*
+srv_gen/*
