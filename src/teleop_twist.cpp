@@ -96,6 +96,7 @@ void cmdVelCallback(const geometry_msgs::TwistConstPtr &msg)
 
 void landCallback(const std_msgs::Empty &msg)
 {    
+	ROS_INFO("ARDrone is commanded to land"); 
     needs_land = true;
 }
 
@@ -106,13 +107,14 @@ void resetCallback(const std_msgs::Empty &msg)
 
 void takeoffCallback(const std_msgs::Empty &msg)
 {
-    
+	ROS_INFO("ARDrone is commanded to takeoff"); 
     needs_takeoff = true;
 }
 
 bool setFlatTrim(ardrone_autonomy::FlatTrim::Request& request, ardrone_autonomy::FlatTrim::Response& response)
 {
 	ardrone_at_set_flat_trim();
+	ROS_INFO("ARDrone is commanded to level calibration"); 
 	return true;
 }
 

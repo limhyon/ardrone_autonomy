@@ -65,7 +65,12 @@ float32[] tags_distance
 #time stamp
 float32 tm
 
-#raw vision
+#raw vision (mm/sec)
 float32 vx_raw
 float32 vy_raw
 float32 vz_raw
+
+#vision cam trans
+float32 tx_drone
+float32 ty_drone
+float32 tz_drone

@@ -75,7 +75,7 @@ ARDroneDriver::~ARDroneDriver()
 
 void ARDroneDriver::run()
 {
-	ros::Rate loop_rate(200);
+	ros::Rate loop_rate(30);
     ros::Time startTime = ros::Time::now();
 
 	while (node_handle.ok())
@@ -101,10 +101,10 @@ void ARDroneDriver::run()
 	    if(current_navdata_seq_id != last_navdata_seq_id)
 		{
                 	publish_navdata();
-                	publish_tf();
 			last_navdata_seq_id = current_navdata_seq_id;
 		}
         }
+                publish_tf();
         	ros::spinOnce();
 		loop_rate.sleep();
 	}
@@ -396,6 +396,9 @@ void ARDroneDriver::publish_navdata()
 	msg.ay = -navdata_phys.phys_accs[ACC_Y] / 1000.0; // g
 	msg.az = -navdata_phys.phys_accs[ACC_Z] / 1000.0; // g
 	
+	msg.tx_drone = navdata.drone_camera_trans.x;
+	msg.ty_drone = navdata.drone_camera_trans.y;
+	msg.tz_drone = navdata.drone_camera_trans.z;
     // New stuff
 
     if (IS_ARDRONE2)
@@ -414,6 +417,7 @@ void ARDroneDriver::publish_navdata()
 	msg.vx_raw = navdata_vision_raw.vision_tx_raw;
 	msg.vy_raw = navdata_vision_raw.vision_ty_raw;
 	msg.vz_raw = navdata_vision_raw.vision_tz_raw;
+
     }
     else
     {
